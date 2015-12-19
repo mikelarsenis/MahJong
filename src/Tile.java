@@ -4,20 +4,225 @@ import java.awt.*;
 abstract public class Tile extends JPanel
 //public class Tile extends JPanel
 {
-	public int faceOffset = 16;
-	public int faceWidth = 78;
-	public int faceHeight = 100;
-	//public Color GREEN = new Color(0,205,0);
-	public Color GREEN = new Color(0,201,87);
-	public Color BLUE = new Color(39,64,139);
-	public Color RED = new Color(205,38,38);
+	static int faceOffset = 16;
+	static int faceWidth = 78;
+	static int faceHeight = 100;
 	
+	//global colors
+	static Color GREEN = new Color(0,201,87);
+	static Color BLUE = new Color(39,64,139);
+	static Color RED = new Color(205,38,38);
+	static Color sGRAY = Color.DARK_GRAY;
+	static Color sCYAN = new Color(0,238,238);
+	
+	//tile location information
+	private int tileRow;
+	private int tileColumn;
+	private int tileLayer;
+	private int zOrder = 0;
 	
 	public Tile()
 	{
 		setSize(new Dimension(95,121));
 		setToolTipText(toString());
 		setOpaque(false);
+	}
+	
+	//getters/setters
+	public int getRow()
+	{
+		return tileRow;
+	}
+	public int getColumn()
+	{
+		return tileColumn;
+	}
+	public int getLayer()
+	{
+		return tileLayer;
+	}
+	public void setRow(int row)
+	{
+		tileRow = row;
+	}
+	public void setColumn(int column)
+	{
+		tileColumn = column;
+	}
+	public void setLayer(int layer)
+	{
+		tileLayer = layer;
+	}
+	public int getZOrder()
+	{
+		return zOrder;
+	}
+	public void setZOrder()
+	{
+		zOrder = getParent().getComponentZOrder(this);
+	}
+	public void resetZOrder()
+	{
+		getParent().setComponentZOrder(this,  zOrder);
+	}
+	
+	//draw Selection circle
+	public void drawSelection(Graphics g, Tile t)
+	{
+		//offset for drawing the selection circle
+		int xOffset0 = ((Tile.faceWidth))*(t.tileColumn+1)+(Tile.faceWidth/2)-3;
+		int yOffset0 = ((Tile.faceHeight))*(t.tileRow)+(Tile.faceHeight/2)-23;
+		int xOffset1 = xOffset0+(16*1);
+		int yOffset1 = yOffset0-(20*1);
+		int xOffset2 = xOffset0+(16*2);
+		int yOffset2 = yOffset0-(20*2);
+		int xOffset3 = xOffset0+(16*3);
+		int yOffset3 = yOffset0-(20*3);
+		int xOffset4 = xOffset0+(16*4);
+		int yOffset4 = yOffset0-(20*4);
+		
+		Graphics2D g2 = (Graphics2D)g;
+		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+			    RenderingHints.VALUE_ANTIALIAS_ON);
+		g.setColor(Color.ORANGE);
+		
+	//special tile cases ([column][row][layer]) -[0][3][0], [13][3][0], [14][3][0], [6][3][4]
+		//[0][3][0], [13][3][0], [14][3][0] case
+		if((t.getColumn() == 0 && t.getRow() == 3 && t.getLayer() == 0) ||
+				(t.getColumn() == 13 && t.getRow() == 3 && t.getLayer() == 0) ||
+				(t.getColumn() == 14 && t.getRow() == 3 && t.getLayer() == 0))
+		{
+			g.fillOval(xOffset0, yOffset0+(Tile.faceHeight/2), 40, 40);
+			g2.setColor(Color.BLACK);
+			g2.setStroke(new BasicStroke(2));
+			g2.drawOval(xOffset0, yOffset0+(Tile.faceHeight/2), 40, 40);
+			g.setFont(new Font("TimesRoman", Font.PLAIN, 23));
+			g.drawString("\u4E80", xOffset0+9, yOffset0+(Tile.faceHeight/2)+27);
+		}
+		//[6][3][4]
+		else if(t.getLayer() == 4)
+		{
+			g.fillOval(xOffset4+(Tile.faceWidth/2), yOffset4+(Tile.faceHeight/2), 40, 40);
+			g2.setColor(Color.BLACK);
+			g2.setStroke(new BasicStroke(2));
+			g2.drawOval(xOffset4+(Tile.faceWidth/2), yOffset4+(Tile.faceHeight/2), 40, 40);
+			g.setFont(new Font("TimesRoman", Font.PLAIN, 23));
+			g.drawString("\u4E80", xOffset4+(Tile.faceWidth/2+9), yOffset4+(Tile.faceHeight/2)+27);
+		}
+	//regular tiles
+		//regular tile, layer 0
+		else if (t.getLayer() == 0)
+		{
+			
+			g.fillOval(xOffset0, yOffset0, 40, 40);
+			g2.setColor(Color.BLACK);
+			g2.setStroke(new BasicStroke(2));
+			g2.drawOval(xOffset0, yOffset0, 40, 40);
+			g.setFont(new Font("TimesRoman", Font.PLAIN, 23));
+			g.drawString("\u4E80", xOffset0+9, yOffset0+27);
+		}
+		//regular tile, layer 1
+		else if (t.getLayer() == 1)
+		{
+			g.fillOval(xOffset1, yOffset1, 40, 40);
+			g2.setColor(Color.BLACK);
+			g2.setStroke(new BasicStroke(2));
+			g2.drawOval(xOffset1, yOffset1, 40, 40);
+			g.setFont(new Font("TimesRoman", Font.PLAIN, 23));
+			g.drawString("\u4E80", xOffset1+9, yOffset1+27);
+		}
+		else if(t.getLayer() == 2)
+		{
+			g.fillOval(xOffset2, yOffset2, 40, 40);
+			g2.setColor(Color.BLACK);
+			g2.setStroke(new BasicStroke(2));
+			g2.drawOval(xOffset2, yOffset2, 40, 40);
+			g.setFont(new Font("TimesRoman", Font.PLAIN, 23));
+			g.drawString("\u4E80", xOffset2+9, yOffset2+27);
+		}
+		else if(t.getLayer() == 3)
+		{
+			g.fillOval(xOffset3, yOffset3, 40, 40);
+			g2.setColor(Color.BLACK);
+			g2.setStroke(new BasicStroke(2));
+			g2.drawOval(xOffset3, yOffset3, 40, 40);
+			g.setFont(new Font("TimesRoman", Font.PLAIN, 23));
+			g.drawString("\u4E80", xOffset3+9, yOffset3+27);
+		}
+	}
+	
+	
+	//draws playable indicator
+	public void drawPlayable(Graphics g, Tile t)
+	{
+		int xOffset0 = ((Tile.faceWidth))*(t.tileColumn+1)+(Tile.faceWidth/2)-3;
+		int yOffset0 = ((Tile.faceHeight))*(t.tileRow)+(Tile.faceHeight/2)-23;
+		int xOffset1 = xOffset0+(16*1);
+		int yOffset1 = yOffset0-(20*1);
+		int xOffset2 = xOffset0+(16*2);
+		int yOffset2 = yOffset0-(20*2);
+		int xOffset3 = xOffset0+(16*3);
+		int yOffset3 = yOffset0-(20*3);
+		int xOffset4 = xOffset0+(16*4);
+		int yOffset4 = yOffset0-(20*4);
+		
+		g.setColor(sCYAN);
+		
+		Graphics2D g2 = (Graphics2D)g;
+		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+			    RenderingHints.VALUE_ANTIALIAS_ON);
+		
+		//special tile cases ([column][row][layer]) -[0][3][0], [13][3][0], [14][3][0], [6][3][4]
+			//[0][3][0], [13][3][0], [14][3][0] case
+			if((t.getColumn() == 0 && t.getRow() == 3 && t.getLayer() == 0) ||
+					(t.getColumn() == 13 && t.getRow() == 3 && t.getLayer() == 0) ||
+					(t.getColumn() == 14 && t.getRow() == 3 && t.getLayer() == 0))
+			{
+				g.fillOval(xOffset0+10, yOffset0+10+(Tile.faceHeight/2), 20, 20);
+				g2.setColor(sGRAY);
+				g2.setStroke(new BasicStroke(2));
+				g2.drawOval(xOffset0+10, yOffset0+10+(Tile.faceHeight/2), 20, 20);
+			}
+			//[6][3][4]
+			else if(t.getLayer() == 4)
+			{
+				g.fillOval(xOffset4+10+(Tile.faceWidth/2), yOffset4+10+(Tile.faceHeight/2), 20, 20);
+				g2.setColor(sGRAY);
+				g2.setStroke(new BasicStroke(2));
+				g2.drawOval(xOffset4+10+(Tile.faceWidth/2), yOffset4+10+(Tile.faceHeight/2), 20, 20);
+			}
+		//regular tiles
+			//regular tile, layer 0
+			else if (t.getLayer() == 0)
+			{
+				
+				g.fillOval(xOffset0+10, yOffset0+10, 20, 20);
+				g2.setColor(sGRAY);
+				g2.setStroke(new BasicStroke(2));
+				g2.drawOval(xOffset0+10, yOffset0+10, 20, 20);
+			}
+			//regular tile, layer 1
+			else if (t.getLayer() == 1)
+			{
+				g.fillOval(xOffset1+10, yOffset1+10, 20, 20);
+				g2.setColor(sGRAY);
+				g2.setStroke(new BasicStroke(2));
+				g2.drawOval(xOffset1+10, yOffset1+10, 20, 20);
+			}
+			else if(t.getLayer() == 2)
+			{
+				g.fillOval(xOffset2+10, yOffset2+10, 20, 20);
+				g2.setColor(sGRAY);
+				g2.setStroke(new BasicStroke(2));
+				g2.drawOval(xOffset2+10, yOffset2+10, 20, 20);
+			}
+			else if(t.getLayer() == 3)
+			{
+				g.fillOval(xOffset3+10, yOffset3+10, 20, 20);
+				g2.setColor(sGRAY);
+				g2.setStroke(new BasicStroke(2));
+				g2.drawOval(xOffset3+10, yOffset3+10, 20, 20);
+			}
 	}
 	
 	//build paint component
@@ -88,7 +293,7 @@ abstract public class Tile extends JPanel
 	
 	public boolean matches(Tile other)
 	{
-		if(other.getClass()== this.getClass())
+		if(other.getClass() == this.getClass())
 		{
 			return true;
 		}
@@ -98,16 +303,5 @@ abstract public class Tile extends JPanel
 		}
 	}
 	
-/*	
-	public static void main(String[] args)
-	{
-		JFrame frame = new JFrame();
-		frame.setLayout(new FlowLayout());
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setTitle("Tile");
-		frame.add(new Tile());
-		frame.pack();
-		frame.setVisible(true);
-	}
-	*/
+
 }

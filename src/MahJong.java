@@ -1,451 +1,366 @@
 import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
+import java.awt.event.ActionEvent;
+import  javax.swing.*;
 
 //public class MahJong extends JFrame
 public class MahJong extends JFrame
-{
-	Tile[][][] tileLocationArray = new Tile[15][8][5]; //Tile[column][row][layer]
-	//to be used for setting the offset of the tiles. Sets the (0,0) position of all layers	
-	private int xLayer0 = 78;
-	private int yLayer0 = 0;
-	private int xLayer1 = xLayer0+(16*1);
-	private int yLayer1 = yLayer0-(20*1);
-	private int xLayer2 = xLayer0+(16*2);
-	private int yLayer2 = yLayer0-(20*2);
-	private int xLayer3 = xLayer0+(16*3);
-	private int yLayer3 = yLayer0-(20*3);
-	private int xLayer4 = xLayer0+(16*4);
-	private int yLayer4 = yLayer0-(20*4);
-	private int xTileOffset = 78;
-	private int yTileOffset = 100;
+{		
+	private boolean gameInPlay = false;
+	public static long lastSeed;
+	public static int remainingTiles;
+	public MahJongBoard board;
 	
-		
 	public MahJong()
 	{
 		setTitle("MahJong");
-		//setSize(600,400);
-		setSize(Toolkit.getDefaultToolkit().getScreenSize()); 
+//		setSize(500,800);
+		setSize(Toolkit.getDefaultToolkit().getScreenSize());
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		
+		createMenu();
 		getContentPane().setBackground(new Color(108,123,139));
-		//getContentPane().add(new Dragon());
-
-		add(new MahJongBoard());
+		
+		
 		setVisible(true);
+		
+	//give options on startup
+		String[] options = {"New Game", "Numbered Game", "Game Rules"};
+		int choice = JOptionPane.showOptionDialog(this, "Welcome to Mahjong Solitare. Choose from the options below.", "Mahjong", 
+				JOptionPane.PLAIN_MESSAGE, JOptionPane.PLAIN_MESSAGE, null, options, options[0]);
+		
+		if(choice == 0)
+			Play();
+		else if(choice == 1)
+			Numbered();
+		else if(choice == 2)
+		{			
+			GameRules();
+						
+		//Open options after game rules displayed
+			String[] options2 = {"New Game", "Numbered Game"};
+			choice = JOptionPane.showOptionDialog(this, "Welcome to Mahjong Solitare. Choose from the options below.", "Mahjong", 
+					JOptionPane.PLAIN_MESSAGE, JOptionPane.PLAIN_MESSAGE, null, options2, options[0]);
+			if(choice == 0)
+				Play();
+			else if(choice == 1)
+				Numbered();
+		}	
+	} //end constructor
+	
+//creates Menu
+	private JMenu makeMenu(String label)
+	{
+		JMenu	menu = new JMenu(label);
+		return menu;
 	}
 	
-	public class MahJongBoard extends JPanel implements MouseListener
+//creates the menu bar
+	public void createMenu()
 	{
-		TileDeck td = new TileDeck(); //creates tile instances and randomizes them in an arraylist
+		JMenuBar menuBar = new JMenuBar();
+		setJMenuBar(menuBar);
 		
-				
-		//constructor
-		public MahJongBoard()
-		{			
-			//Fill the location array with instances
-			fillLayer0();
-			fillLayer1();
-			fillLayer2();
-			fillLayer3();
-			fillLayer4();
-	
-			setOpaque(false);
-			setLayout(null);
-			
-			
-			//draw board			
-			drawSpecialTile();
-			for(int i = 4; i>-1; i--)
+		JMenu gameMenu = makeMenu("Game");
+		JMenu moveMenu = makeMenu("Move");
+		JMenu helpMenu = makeMenu("Help");
+		
+	//Game Menu Actions
+		Action playAction = new AbstractAction("Play")	
+		{
+			public void actionPerformed(ActionEvent e)
 			{
-				drawLayer(i);
+				
+				Play(); 
 			}
-						
-		} //end constructor
-		
-		
-		//creates instances of tiles and fills the tileLocationArray
-		public void fillLayer0()
+		};
+		Action restartAction = new AbstractAction("Restart")	
 		{
-			for(int j = 0; j<7; j++)	
-			{	
-				switch(j)
-				{
-				
-					case 0:
-						//row 0, layer 0  tileLocationArray[column][row][layer]
-						for(int i=0; i<15; i++)
-						{
-							if(i<1 || i>12)
-								tileLocationArray[i][j][0] = null;
-							else
-								tileLocationArray[i][j][0] = td.Deal();
-						}
-						break;
-						
-					case 1:
-						//row 1, layer 0
-						for(int i=0;i<15;i++)
-						{
-							if(i<3 || i>10)
-								tileLocationArray[i][j][0] = null;
-							else
-								tileLocationArray[i][j][0] = td.Deal();
-						}
-						break;
-						
-					case 2:
-						//row 2, layer 0
-						for(int i = 0; i < 15; i++)
-						{
-							if(i<2 || i>11)
-								tileLocationArray[i][j][0] = null;
-							else
-								tileLocationArray[i][j][0] = td.Deal();
-						}
-						break;
-						
-					case 3:
-						//row 3, layer 0 (no nulls)
-						for(int i = 0; i < 15; i++)
-						{
-							tileLocationArray[i][j][0] = td.Deal();
-						}
-						break;
-					
-					case 4:
-						//row 4, layer 0
-						for(int i = 0; i < 15; i++)
-						{
-							if(i<1 || i>12)
-								tileLocationArray[i][j][0] = null;
-							else
-								tileLocationArray[i][j][0] = td.Deal();
-						}
-						break;
-						
-					case 5:
-						//row 5, layer 0
-						for(int i = 0; i < 15; i++)
-						{
-							if(i<2 || i>11)
-								tileLocationArray[i][j][0] = null;
-							else
-								tileLocationArray[i][j][0] = td.Deal();
-						}
-						break;
-					
-					case 6:
-						//row 6, layer 0
-						for(int i = 0; i < 15; i++)
-						{
-							if(i<3 || i>10)
-								tileLocationArray[i][j][0] = null;
-							else
-								tileLocationArray[i][j][0] = td.Deal();
-						}
-						break;
-						
-					case 7:
-						//row 7, layer 0
-						for(int i = 0; i < 15; i++)
-						{
-							if(i<1 || i>12)
-								tileLocationArray[i][j][0] = null;
-							else
-								tileLocationArray[i][j][0] = td.Deal();
-						}
-						break;
-					
-					default:
-						System.out.println("We've got a problem in the switch statement");
-					
-						
-				}//send switch
-				
-			}//end outer for loop
-		
-		}//end method
-		public void fillLayer1()
-		{
-			//j is the row value
-			for(int j = 0; j<8; j++)
+			public void actionPerformed(ActionEvent e)
 			{
-				switch(j)
-				{
-					case 0:
-					case 7:
-						for(int i =0; i<15; i++)
-						{
-							tileLocationArray[i][j][1] = null;
-						}
-						break;
-						
-					default:
-						for(int i = 0; i<15; i++)
-						{
-							if(i<4 || i>9)
-							{
-								tileLocationArray[i][j][1] = null;
-							}
-							else
-							{
-								tileLocationArray[i][j][1] = td.Deal();
-							}
-						}
-						break;
-				}//end switch
+				Restart(); 
+			}
+		};
+		Action numberedAction = new AbstractAction("Play Numbered Game")
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				Numbered(); 
+			}
+		};
+		Action getSeed = new AbstractAction("Current Board Number")
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				getSeed(); 
+			}
+		};
+	//Game Menu Creation
+		menuBar.add(gameMenu);
+			JMenuItem play = new JMenuItem(playAction);
+			play.setToolTipText("Start a new game");
+			play.setMnemonic('P');
+			play.setAccelerator(KeyStroke.getKeyStroke("ctrl P"));
+			gameMenu.add(play);
 			
-			}//end outer for
+			JMenuItem restart = new JMenuItem(restartAction);
+			gameMenu.add(restart);
+			restart.setMnemonic('R');
+			restart.setAccelerator(KeyStroke.getKeyStroke("ctrl R"));
+			restart.setToolTipText("Reset current game");
+			
+			gameMenu.addSeparator();
+			JMenu numbered = makeMenu("Numbered");
+			numbered.setMnemonic('N');
+			gameMenu.add(numbered);
+			
+			JMenuItem startNumbered = new JMenuItem(numberedAction);
+			startNumbered.setToolTipText("Open specific board number");
+			numbered.add(startNumbered);
+			
+			JMenuItem getBoardSeed = new JMenuItem(getSeed);
+			getBoardSeed.setToolTipText("Get current board number");
+			numbered.add(getBoardSeed);
 						
-		}//end method
-		public void fillLayer2()
+	//Move menu Actions
+		Action undoAction = new AbstractAction("Undo")
 		{
-			for(int j =0; j<8; j++)
+			public void actionPerformed(ActionEvent e)
 			{
-				switch(j)
-				{
-					case 0:
-					case 1:
-					case 6:
-					case 7:
-						for(int i=0; i<15; i++)
-						{
-							tileLocationArray[i][j][2] = null;
-						}
-						break;
-						
-					default:
-						for(int i =0; i<15; i++)
-						{
-							if(i<5 || i>8)
-							{
-								tileLocationArray[i][j][2] = null;
-							}
-							else
-							{
-								tileLocationArray[i][j][2] = td.Deal();
-							}
-						}
-						break;
-				}
+				Undo();
+			}
+		};
+	//Move Menu Creation	
+		menuBar.add(moveMenu);
+			JMenuItem undo = new JMenuItem(undoAction);
+			moveMenu.add(undo);
+			undo.setToolTipText("Undo move");
+			undo.setAccelerator(KeyStroke.getKeyStroke("ctrl Z"));
+			
+	//Help Menu Action
+		Action operationAction = new AbstractAction("Operation")	
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				Operations(); 
+			}
+		};	
+		Action gameRulesAction = new AbstractAction("Game Rules")	
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				GameRules(); 
+			}
+		};
+		
+	//Help Menu Creation
+		menuBar.add(helpMenu);
+			JMenuItem operation = new JMenuItem(operationAction);
+			helpMenu.add(operation);
+			operation.setToolTipText("View menu descriptions");
+			JMenuItem gameRules = new JMenuItem(gameRulesAction);
+			helpMenu.add(gameRules);
+			gameRules.setToolTipText("View game rules");
+	}// end create menu
+	
+//Game menu Methods
+	public void Play()
+	{
+		//make sure they want to start over if game in play
+		if(gameInPlay == true)
+		{
+			//give warning of lost progress if current game in progress
+			if(JOptionPane.showConfirmDialog(this, "Start a new game? Current progress will be lost.", "New Game", 
+					JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE) 
+					== JOptionPane.OK_OPTION)
+			{
+				getContentPane().removeAll();
+				setVisible(false);
+				lastSeed = System.currentTimeMillis()%1000;
+				board = new MahJongBoard(lastSeed);
+				add(board);
+				setVisible(true);
+				gameInPlay = true;
 			}
 		}
-		public void fillLayer3()
+		//reset JFrame and populate with tiles
+		else
 		{
-			for(int j = 0; j<8; j++)
-			{
-				switch(j)
-				{
-					case 0:
-					case 1:
-					case 2:
-					case 5:
-					case 6:
-					case 7:
-						for(int i=0; i<15; i++)
-						{
-							tileLocationArray[i][j][3] = null;
-						}
-						break;
-					
-					default:
-						for(int i = 0; i<15; i++)
-						{
-							if(i<6 || i>7)
-							{
-								tileLocationArray[i][j][3] = null;
-							}
-							else
-							{
-								tileLocationArray[i][j][3] = td.Deal();
-							}
-						}
-				}//end switch
-				
-			}//end outer for
-			
-		}//end method
-		public void fillLayer4()
-		{
-			for(int j = 0; j<8; j++)
-			{
-				switch(j)
-				{
-					case 3:
-						for(int i = 0; i<15; i++)
-						{
-							if(i!=6)
-							{
-								tileLocationArray[i][j][4] = null;
-							}
-							else
-							{
-								tileLocationArray[i][j][4] = td.Deal();
-							}
-						}
-						break;
-						
-					default:
-						for(int i = 0; i<15; i++)
-						{
-							tileLocationArray[i][j][4] = null;
-						}
-						break;
-						
-				} //end switch
-				
-			}//end outer for
-			
-		}//end method
-
-		//draws the entire layer
-		public void drawLayer(int layer)
-		{
-			//draw left to right
-			//draw bottom to top
-			for(int j = 7; j>=0; j--)
-			{
-				for(int i = 0; i<15; i++)
-				{
-					if(tileLocationArray[i][j][layer] != null)
-					{
-						drawTile(i,j,layer);
-					}
-				}
-			}
-		}// end method
-	
-		//draws the left-most tile and the top tile
-		public void drawSpecialTile()
-		{
-			Tile t;
-			//tile(0,3,0)
-			t=tileLocationArray[0][3][0];
-			t.setLocation(getXLayer(0) + (xTileOffset*0), getYLayer(0) + (yTileOffset*3)+((yTileOffset)/2));
-			t.addMouseListener(this);
-			add(t);	
-			
-			//top tile
-			t=tileLocationArray[6][3][4];
-			t.setLocation(getXLayer(4) + (xTileOffset*6)+((xTileOffset)/2), getYLayer(4) + (yTileOffset*3)+((yTileOffset)/2));
-			t.addMouseListener(this);
-			add(t);
+			getContentPane().removeAll();
+			setVisible(false);
+			lastSeed = System.currentTimeMillis()%1000;
+			board = new MahJongBoard(lastSeed);
+			add(board);
+			setVisible(true);
+			gameInPlay = true;
+		}		
+	}
+	public void Restart()
+	{
+		//give warning of lost progress if current game in progress
+		if(JOptionPane.showConfirmDialog(this, "Start over? Current progress will be lost.", "Restart Game", 
+				JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE) 
+				== JOptionPane.OK_OPTION)	
+		{	
+			getContentPane().removeAll();
+			setVisible(false);
+			board = new MahJongBoard(lastSeed);
+			add(board);			
+			setVisible(true);
+			gameInPlay = true;
 		}
-		
-		//draws on tile
-		public void drawTile(int x, int y, int layer)
-				{
-					Tile t;
-					t = tileLocationArray[x][y][layer];
-					//if tile is special case
-					//(0,3,0), (0,13,0), (0,14,0)
-					if((x==0 && y==3 && layer==0) || (x==6 && y==3 && layer == 4))
+	}
+	public void Numbered()
+	{
+		if(gameInPlay == true)
+		{
+			if(JOptionPane.showConfirmDialog(this, "Start a numbered game? Current progress will be lost.", "Numbered Game", 
+					JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE) 
+					== JOptionPane.OK_OPTION)
+			{
+				//get board #, parse to long, store in lastSeed
+				String boardNum = JOptionPane.showInputDialog(this, "Please enter the board number: ", "Board number", JOptionPane.PLAIN_MESSAGE);
+				//display one more time if blank info
+					if( boardNum == null || boardNum.length() == 0)
 					{
-						
-						return;
-					}
-					if(x==13 && y==3 && layer==0)
-					{
-						t=tileLocationArray[13][3][0];
-						t.setLocation(getXLayer(0) + (xTileOffset*13), getYLayer(0) + (yTileOffset*3)+((yTileOffset)/2));
-						t.addMouseListener(this);
-						add(t);
-						return;
-					}
-					
-					if(x==14 && y==3 && layer==0)
-					{
-						t=tileLocationArray[14][3][0];
-						t.setLocation(getXLayer(0) + (xTileOffset*14), getYLayer(0) + (yTileOffset*3)+((yTileOffset)/2));
-						t.addMouseListener(this);
-						add(t);
-						return;
+						boardNum = JOptionPane.showInputDialog(this, "Enter the board number: ", "Board number", JOptionPane.PLAIN_MESSAGE);
+						lastSeed = Long.parseLong(boardNum);
 					}
 					else
 					{
-						t.setLocation(getXLayer(layer) + (xTileOffset*x), getYLayer(layer) + (yTileOffset*y));
+						lastSeed = Long.parseLong(boardNum);
 					}
-					t.addMouseListener(this);
-					add(t);
-				}
 				
-		
-		//returns the x and y offset of a given layer
-		public int getXLayer(int layer)
-		{
-			if(layer == 0)
-				return xLayer0;
-			else if(layer == 1)
-				return xLayer1;
-			else if(layer == 2)
-				return xLayer2;
-			else if(layer == 3)
-				return xLayer3;
-			else
-				return xLayer4;
+					//reset JFrame and display tiles
+					getContentPane().removeAll();
+					setVisible(false);
+					board = new MahJongBoard(lastSeed);
+					add(board);
+					setVisible(true);
+					gameInPlay = true;
+			}
 		}
-		public int getYLayer(int layer)
+		else
 		{
-			if(layer == 0)
-				return yLayer0;
-			else if(layer == 1)
-				return yLayer1;
-			else if(layer == 2)
-				return yLayer2;
-			else if(layer == 3)
-				return yLayer3;
-			else
-				return yLayer4;
-		}
-
-		
-		//event listeners
-		public void mouseClicked(MouseEvent e) {}
-		public void mousePressed(MouseEvent e) 
-		{
-			Tile t = (Tile)e.getSource();
+			//get board #, parse to long, store in lastSeed
+			String boardNum = JOptionPane.showInputDialog(this, "Please enter the board number: ", "Board number", JOptionPane.PLAIN_MESSAGE);
 			
-			//System.out.println(t);
-			remove(t);
-			revalidate();
-			repaint();
+			//display one more time if blank info
+			if( boardNum == null || boardNum.length() == 0)
+			{
+				boardNum = JOptionPane.showInputDialog(this, "Enter the board number: ", "Board number", JOptionPane.PLAIN_MESSAGE);
+				lastSeed = Long.parseLong(boardNum);
+			}
+			else
+			{
+				lastSeed = Long.parseLong(boardNum);
+			}
 			
+			//reset JFrame and display tiles
+			getContentPane().removeAll();
+			setVisible(false);
+			board = new MahJongBoard(lastSeed);
+			add(board);
+			setVisible(true);
+			gameInPlay = true;
 		}
-		public void mouseReleased(MouseEvent e) {}
-		public void mouseEntered(MouseEvent e) 
-		{
-			//System.out.println(e.getSource());
-		}
-		public void mouseExited(MouseEvent e) {}
-
-		
-		
-	} //end MahJongBoard class
-	
-	public class Dragon extends JComponent
+	}
+	public void getSeed()
 	{
-		private ImageIcon image = new ImageIcon("images/dragon_bg.png");
-		public Dragon()
+		if(lastSeed == 0)
 		{
-			setOpaque(false);
+			JOptionPane.showMessageDialog(this, "No board currently loaded.", "No board number", JOptionPane.ERROR_MESSAGE);
 		}
-		protected void paintComponent(Graphics g)
+		else
 		{
-			super.paintComponent(g);
-			g.drawImage(image.getImage(), 0, 0, null);
+			JOptionPane.showMessageDialog(this, "The current board number: " + lastSeed, "Board Number", JOptionPane.PLAIN_MESSAGE);
 		}
 	}
 	
-	public void paintComponent(Graphics g)
+//Move menu Methods
+	public void Undo()
 	{
-		String fileString = "images/dragon_bg.png";
-		ImageIcon dragon = new ImageIcon(getClass().getResource(fileString));
-		g.drawImage(dragon.getImage(), 100, 50, null);
+		if(board.undoList.size()>0)
+		{
+			Tile t1 = board.undoList.remove(board.undoList.size()-1);
+			Tile t2 = board.undoList.remove(board.undoList.size()-1);
+			
+		//place tiles back in location array
+			board.tileLocationArray[t1.getColumn()][t1.getRow()][t1.getLayer()] = t1;
+			board.tileLocationArray[t2.getColumn()][t2.getRow()][t2.getLayer()] = t2;
+			
+		//adding tiles back to the board
+			//board.add(t1, t1.getZOrder());
+			//board.add(t2, t2.getZOrder());
+			board.add(t1);
+			board.add(t2);
+			board.setComponentZOrder(t1, t1.getZOrder());
+			board.setComponentZOrder(t2, t2.getZOrder());
+			
+			board.repaint();
+		}
+		else
+		{
+			JOptionPane.showMessageDialog(this, "There are no move to undo.", "Undo Move", JOptionPane.ERROR_MESSAGE);
+		}
 	}
+	
+//Help menu	
+	public void GameRules()
+	{
+		JOptionPane.showMessageDialog(this, "   The goal of the game is to remove all tiles from the board.\n"
+										  + "Tiles may be removed in pairs if they match.  Two tiles match\n"
+										  + "if they are the same kind of tile and if their ranks are equal.\n"
+										  + "For example, a Bamboo 6 tile matches any of the other three\n"
+										  + "Bamboo tiles on the board, but it does not match a Bamboo 5\n"
+										  + "nor a Circle 6 tile.  Any two season tiles match as do any\n"
+										  + "two flower tiles.",
+										  "Mahjong Rules", JOptionPane.PLAIN_MESSAGE);
+	}
+	public void Operations()
+	{
+		char bullet = "\u00b7".toCharArray()[0];
+		//display menu breakdown
+		JOptionPane.showMessageDialog(this, " Menu Breakdown:\n\n"
+				  + " GAME\n"
+				  + "    " + bullet + "Play - start a new game\n"
+				  + "    " + bullet + "Restart - restart the current board configuration\n"
+				  + "    " + bullet + "Numbered\n"
+				  + "        " + bullet + "Play Numbered Game - enter board number to play\n"
+				  + "        " + bullet + "Current Board Number - get current board info\n"
+				  + " SOUND\n"
+				  + "     " + bullet + "On - turn sound on\n"
+				  + "     " + bullet + "Off - turn sound off\n"
+				  + " MOVE\n"
+				  + "     " + bullet + "Undo - undo last move\n"
+				  + " HELP\n"
+				  + "     " + bullet + "Operation - info on running this program\n"
+				  + "     " + bullet + "Game Rules - Mahjong Solitare rules\n",
+				  "Program Operations", JOptionPane.PLAIN_MESSAGE);
+		
+		//display how to select things
+		JOptionPane.showMessageDialog(this, "SELECTING TILES:\n"
+				+ "  Hover over a tile to view if the tile is able \n"
+				+"to be selected or not.  If it is able to be selected,\n"
+				+ "an icon will appear on the tile your mouse cursor \n"
+				+ "is over.  Click the selectable tile and a larger icon\n"
+				+ "will display on the tile signifying it is selected.\n"
+				+ "Select the same tile again to deselect it.  After \n"
+				+ "selecting the first tile, click on any selectable tile\n"
+				+ "to see if they match. Matching tiles will be removed \n"
+				+ "from the board.  Once all tiles are removed from the \n"
+				+ "board, the game is won!"
+					, "Program Operations", JOptionPane.PLAIN_MESSAGE);
+		
+	}
+	
+	public static void GameWon()
+	{
+		JOptionPane.showMessageDialog(null, "CONGRATULATIONS!!! You won the game!", "Winner!", JOptionPane.PLAIN_MESSAGE);
+		System.exit(0);
+	}
+//MAIN
 	public static void main (String args[])
 	{
 		new MahJong();
 	}
 
-}//end MahJong class
+}  //end Mahjong

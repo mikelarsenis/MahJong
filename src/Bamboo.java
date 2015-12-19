@@ -1,3 +1,7 @@
+/*------------------------
+ * DRAWS ONE BAMBOO ICON
+ ------------------------*/
+
 import java.awt.*;
 
 public class Bamboo extends Tile

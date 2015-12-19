@@ -1,5 +1,4 @@
 import java.awt.*;
-//import javax.swing.*;
 
 public class CharacterTile extends Tile 
 {
@@ -28,7 +27,7 @@ public class CharacterTile extends Tile
 		g.setFont(defaultFont);
 		g.setColor(Color.BLACK);
 		
-		//switch statement for what to draw on each
+	//switch statement for what to draw on each
 		switch(symbol)
 		{
 			case '1': 
@@ -172,40 +171,4 @@ public class CharacterTile extends Tile
 			return "Character " + symbol;
 		}
 	}
-	
-/*	
-	public static void main(String[] args)
-	{
-		JFrame		frame = new JFrame();
-		JPanel		tiles = new JPanel();
-		JScrollPane	scroller = new JScrollPane(tiles);
-
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setTitle("Character Tiles");
-		frame.add(scroller);
-
-		// Try something like this if your tiles don't fit on the screen.
-		// Replace "tile width" and "tile height" with your values.
-		//scroller.setPreferredSize(new Dimension(8 * 75, 40 + 100));
-
-		tiles.add(new CharacterTile('1'));
-		tiles.add(new CharacterTile('2'));
-		tiles.add(new CharacterTile('3'));
-		tiles.add(new CharacterTile('4'));
-		tiles.add(new CharacterTile('5'));
-		tiles.add(new CharacterTile('6'));
-		tiles.add(new CharacterTile('7'));
-		tiles.add(new CharacterTile('8'));
-		tiles.add(new CharacterTile('9'));
-		tiles.add(new CharacterTile('N'));
-		tiles.add(new CharacterTile('E'));
-		tiles.add(new CharacterTile('W'));
-		tiles.add(new CharacterTile('S'));
-		tiles.add(new CharacterTile('C'));
-		tiles.add(new CharacterTile('F'));
-
-		frame.pack();
-		frame.setVisible(true);
-	}
-	*/
 }

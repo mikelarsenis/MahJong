@@ -1,3 +1,7 @@
+/*------------------------
+ * DRAWS ONE CIRCLE ICON
+ ------------------------*/
+
 import java.awt.*;
 
 public class Circle extends Tile
