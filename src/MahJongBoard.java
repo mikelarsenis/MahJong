@@ -626,8 +626,8 @@ public class MahJongBoard extends JPanel implements MouseListener
 						//Removable tiles
 							//get Z-Order of removed tiles and add to undoList, check if we've won the game
 							selected1.setZOrder();
-							selected2.setZOrder();
 							remove(selected1);
+							selected2.setZOrder();
 							remove(selected2);
 					
 						//add tiles to undo list
